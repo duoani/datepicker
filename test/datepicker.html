@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="../src/css/datepicker.css">
+    <script src="../src/plugins/jquery/dist/jquery.min.js"></script>
+    <script src="../src/js/datepicker.js"></script>
+</head>
+<body>
+    <div class="datepicker">
+        <div class="datepicker-days" style="display:block;">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="previous"><</th>
+                        <th class="switch" colspan="5">2016年07月</th>
+                        <th class="next">></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="day old">28</td>
+                        <td class="day old">29</td>
+                        <td class="day old">30</td>
+                        <td class="day old">31</td>
+                        <td class="day disabled">1</td>
+                        <td class="day">2</td>
+                        <td class="day">3</td>
+                    </tr>
+                    <tr>
+                        <td class="day">4</td>
+                        <td class="day range-start selected active">5</td>
+                        <td class="day range">6</td>
+                        <td class="day range">7</td>
+                        <td class="day range">8</td>
+                        <td class="day range">9</td>
+                        <td class="day range">10</td>
+                    </tr>
+                    <tr>
+                        <td class="day range">11</td>
+                        <td class="day range">12</td>
+                        <td class="day range">13</td>
+                        <td class="day range">14</td>
+                        <td class="day range-end selected">15</td>
+                        <td class="day">16</td>
+                        <td class="day">17</td>
+                    </tr>
+                    <tr>
+                        <td class="day">18</td>
+                        <td class="day">19</td>
+                        <td class="day">20</td>
+                        <td class="day">21</td>
+                        <td class="day">22</td>
+                        <td class="day">23</td>
+                        <td class="day">24</td>
+                    </tr>
+                    <tr>
+                        <td class="day">25</td>
+                        <td class="day">26</td>
+                        <td class="day">27</td>
+                        <td class="day">28</td>
+                        <td class="day">29</td>
+                        <td class="day">30</td>
+                        <td class="day new">1</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="datepicker-months" style="display:block;">
+            <table>
+                <thead>
+                <tr>
+                    <th class="previous v-hide"><</th>
+                    <th class="switch" colspan="5">Months</th>
+                    <th class="next v-hide">></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td colspan="7">
+                        <span class="month" >一月</span>
+                        <span class="month" >二月</span>
+                        <span class="month" >三月</span>
+                        <span class="month focus">四月</span>
+                        <span class="month" >五月</span>
+                        <span class="month" >六月</span>
+                        <span class="month" >七月</span>
+                        <span class="month" >八月</span>
+                        <span class="month" >九月</span>
+                        <span class="month" >十月</span>
+                        <span class="month" >十一月</span>
+                        <span class="month" >十二月</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="datepicker-years" style="display:block;">
+            <table>
+                <thead>
+                <tr>
+                    <th class="previous"><</th>
+                    <th class="switch" colspan="5">2000-2011</th>
+                    <th class="next">></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td colspan="7">
+                        <span class="year">2000</span>
+                        <span class="year">2001</span>
+                        <span class="year">2002</span>
+                        <span class="year focus">2003</span>
+                        <span class="year">2004</span>
+                        <span class="year">2005</span>
+                        <span class="year">2006</span>
+                        <span class="year">2007</span>
+                        <span class="year">2008</span>
+                        <span class="year">2009</span>
+                        <span class="year">20010</span>
+                        <span class="year">20011</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="container" id="container" data-date-start-date="1987-7-20"></div>
+    <script>
+        $('#container').datepicker({});
+    </script>
+</body>
+</html>

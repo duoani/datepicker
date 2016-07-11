@@ -1,0 +1,12 @@
+{
+  "name": "datepicker",
+  "main": [
+    "dist/css/datepicker.css",
+    "dist/js/datepicker.js"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "jquery" : ">=1.7.1 <3.0.0"
+  },
+  "ignore": []
+}
