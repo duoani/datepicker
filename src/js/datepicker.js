@@ -92,7 +92,7 @@
     var headTemplate = '<thead>'+
         '<tr>'+
         '<th class="previous">&lt;</th>'+
-        '<th colspan="5" class="datepicker-switch"></th>'+
+        '<th colspan="5" class="switch"></th>'+
         '<th class="next">&gt;</th>'+
         '</tr>'+
         '</thead>';
@@ -128,6 +128,10 @@
         '</table>'+
         '</div>'+
         '</div>';
+
+    var DATE_PANEL_SELECTOR = '.datepicker-days',
+        MONTH_PANEL_SELECTOR = '.datepicker-months',
+        YEAR_PANEL_SELECTOR = '.datepicker-years';
 
     var DatePicker = function(element, options){
         this.$element = $(element);
@@ -182,25 +186,27 @@
             while(w < 6){
                 cal += '<tr>';
                 for(j = 0; j<7; j++){
-                    var cls = '',
+                    var clsName = '',
                         t;
                     if(i<0){ //pre month
-                        cls += ' old';
+                        clsName += ' old';
                         t = preMonthDays + i + 1;
                     }else if(i > days - 1){ //next month
-                        cls += ' new';
+                        clsName += ' new';
                         t = i - days + 1;
                     }else{ //current month
                         t = i + 1;
                     }
-                    cal += '<td class="day '+cls+'">'+t+'</td>';
+                    cal += '<td class="day '+clsName+'">'+t+'</td>';
                     i++;
                 }
                 cal += '</tr>';
                 w++;
             }
             this.$picker.find('.datepicker-days tbody').html(cal);
+            this.updateNavArrows();
             this.fillMonths();
+            this.setTitle(DATE_PANEL_SELECTOR, dateHelper.formatDate(d, 'yyyy-m'));
         },
         fillDow: function(){
             var options = this.options,
@@ -220,6 +226,29 @@
                 mon += '<span class="month'+(currMonth === i ? ' focus' : '')+'">'+dates[options.language].monthsShort[i]+'</span>'
             }
             this.$picker.find('.datepicker-months td').html(mon);
+        },
+        setTitle: function(selector, title){
+            this.$picker.find(selector)
+                .find('th:eq(1)')
+                .text(title);
+        },
+        updateNavArrows: function () {
+            var d = this.viewDate,
+                year = d.getFullYear(),
+                month = d.getMonth(),
+                day = d.getDate(),
+                minDate = this.options.minDate,
+                maxDate = this.options.maxDate,
+                minLimit, maxLimit;
+
+            switch(this.viewMode){
+                case 0:
+                    minLimit = minDate !== -Infinity && year <= minDate.getFullYear() && month <= minDate.getMonth();
+                    maxLimit = maxDate !== Infinity && year >= maxDate.getFullYear() && month >= maxDate.getMonth();
+                    this.$picker.find('.previous').css('visibility', minLimit ? 'hidden' : 'visible');
+                    this.$picker.find('.next').css('visibility', maxLimit ? 'hidden' : 'visible');
+                    break;
+            }
         },
         _processOptions: function(opts){
             // Store raw options for reference
@@ -332,10 +361,10 @@
 
             if(!data){
                 var elopts = getOptionsFromElem(this, 'date'),
-                // Preliminary otions
+                    // Preliminary otions
                     xopts = $.extend({}, defaults, elopts, options),
                     locopts = getOptionsFromLocale(xopts.language),
-                // Options priority: js args, data-attrs, locales, defaults
+                    // Options priority: js args, data-attrs, locales, defaults
                     opts = $.extend({}, defaults, locopts, elopts, options);
 
                 data = new DatePicker(this, opts);
@@ -400,7 +429,7 @@
             titleFormat: "MM yyyy"
         }
     };
-    dateHelper = $.fn.datepicker.helper = {
+    var dateHelper = $.fn.datepicker.helper = {
         validParts: /dd?|DD?|mm?|MM?|yy(?:yy)?/g,
         nonpunctuation: /[^ -\/:-@\u5e74\u6708\u65e5\[-`{-~\t\n\r]+/g,
         parseFormat: function(format){
@@ -556,33 +585,91 @@
             }
             return date;
         },
-        formatDate: function(date, format, language){
-            if (!date)
-                return '';
-            if (typeof format === 'string')
-                format = this.parseFormat(format);
-            if (format.toDisplay)
-                return format.toDisplay(date, format, language);
-            var val = {
-                d: date.getUTCDate(),
-                D: dates[language].daysShort[date.getUTCDay()],
-                DD: dates[language].days[date.getUTCDay()],
-                m: date.getUTCMonth() + 1,
-                M: dates[language].monthsShort[date.getUTCMonth()],
-                MM: dates[language].months[date.getUTCMonth()],
-                yy: date.getUTCFullYear().toString().substring(2),
-                yyyy: date.getUTCFullYear()
-            };
-            val.dd = (val.d < 10 ? '0' : '') + val.d;
-            val.mm = (val.m < 10 ? '0' : '') + val.m;
-            date = [];
-            var seps = $.extend([], format.separators);
-            for (var i=0, cnt = format.parts.length; i <= cnt; i++){
-                if (seps.length)
-                    date.push(seps.shift());
-                date.push(val[format.parts[i]]);
+        /**
+         * 对目标数字进行0补齐处理
+         * @name numberPad
+         * @function
+         * @grammar numberPad(source, length)
+         * @param {number} source 需要处理的数字
+         * @param {number} length 需要输出的长度
+         *
+         * @returns {string} 对目标数字进行0补齐处理后的结果
+         */
+        numberPad: function (source, length) {
+            if (isNaN(source)) {
+                return ""
             }
-            return date.join('');
+            var pre = "",
+                negative = (source < 0),
+                string = String(Math.abs(source));
+
+            if (string.length < length) {
+                pre = (new Array(length - string.length + 1)).join('0');
+            }
+
+            return (negative ? "-" : "") + pre + string;
+        },
+        /**
+         * 对目标日期对象进行格式化
+         * @name formatDate
+         * @function
+         * @grammar formatDate(source, pattern)
+         * @param {Date} source 目标日期对象
+         * @param {string} pattern 日期格式化规则
+         * @remark
+         *
+         <b>格式表达式，变量含义：</b><br><br>
+         hh: 带 0 补齐的两位 12 进制时表示<br>
+         h: 不带 0 补齐的 12 进制时表示<br>
+         HH: 带 0 补齐的两位 24 进制时表示<br>
+         H: 不带 0 补齐的 24 进制时表示<br>
+         mm: 带 0 补齐两位分表示<br>
+         m: 不带 0 补齐分表示<br>
+         ss: 带 0 补齐两位秒表示<br>
+         s: 不带 0 补齐秒表示<br>
+         yyyy: 带 0 补齐的四位年表示<br>
+         yy: 带 0 补齐的两位年表示<br>
+         MM: 带 0 补齐的两位月表示<br>
+         M: 不带 0 补齐的月表示<br>
+         dd: 带 0 补齐的两位日表示<br>
+         d: 不带 0 补齐的日表示
+         *
+         * @returns {string} 格式化后的字符串
+         */
+        formatDate: function (source, pattern) {
+            if ('string' != typeof pattern) {
+                return source.toString();
+            }
+
+            function replacer(patternPart, result) {
+                pattern = pattern.replace(patternPart, result);
+            }
+
+            var pad = this.numberPad,
+                year = source.getFullYear(),
+                month = source.getMonth() + 1,
+                date2 = source.getDate(),
+                hours = source.getHours(),
+                minutes = source.getMinutes(),
+                seconds = source.getSeconds();
+
+            replacer(/yyyy/g, pad(year, 4));
+            replacer(/yy/g, pad(parseInt(year.toString().slice(2), 10), 2));
+            replacer(/mm/g, pad(month, 2));
+            replacer(/m/g, month);
+            replacer(/dd/g, pad(date2, 2));
+            replacer(/d/g, date2);
+
+            //replacer(/HH/g, pad(hours, 2));
+            //replacer(/H/g, hours);
+            //replacer(/hh/g, pad(hours % 12, 2));
+            //replacer(/h/g, hours % 12);
+            //replacer(/mm/g, pad(minutes, 2));
+            //replacer(/m/g, minutes);
+            //replacer(/ss/g, pad(seconds, 2));
+            //replacer(/s/g, seconds);
+
+            return pattern;
         }
     }
 }));

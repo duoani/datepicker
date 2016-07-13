@@ -1,0 +1,11 @@
+.daterangepicker{
+    width: 456px;
+    overflow: hidden;
+}
+.datepicker-left, .datepicker-right{
+    float: left;
+}
+.daterangepicker .datepicker table tr td.new,
+.daterangepicker .datepicker table tr td.old{
+    visibility: hidden;
+}
